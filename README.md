@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Buscar Região de Campo Grande - MS</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+    input, button { padding: 10px; font-size: 16px; width: 100%; margin-top: 10px; }
+    #resultado { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h2>Buscar Região Administrativa de Campo Grande - MS</h2>
+  <input type="text" id="endereco" placeholder="Digite o endereço completo (ex: Rua Jerônimo de Albuquerque, 1821)">
+  <button onclick="buscarRegiao()">Buscar</button>
+  <div id="resultado"></div>
+
+  <script>
+    const mapaRegioes = {
+      "Aero Rancho": "Anhanduizinho",
+      "Parati": "Anhanduizinho",
+      "Pioneiros": "Anhanduizinho",
+      "Alves Pereira": "Anhanduizinho",
+      "Centenário": "Anhanduizinho",
+      "Lageado": "Anhanduizinho",
+      "Los Angeles": "Anhanduizinho",
+      "Centro-Oeste": "Anhanduizinho",
+      "Guanandi": "Anhanduizinho",
+      "Piratininga": "Anhanduizinho",
+      "Vila Jacy": "Anhanduizinho",
+      "Jardim América": "Anhanduizinho",
+      "América": "Anhanduizinho", // sinônimo
+      "Jockey Club": "Anhanduizinho",
+      "Taquarussu": "Anhanduizinho",
+      
+      "Maria Aparecida Pedrossian": "Bandeira",
+      "Tiradentes": "Bandeira",
+      "São Lourenço": "Bandeira",
+      "Vilas Boas": "Bandeira",
+      "TV Morena": "Bandeira",
+      "Jardim Paulista": "Bandeira",
+      "Dr. Albuquerque": "Bandeira",
+      "Carlota": "Bandeira",
+      "Rita Vieira": "Bandeira",
+      "Universitário": "Bandeira",
+      "Moreninha I": "Bandeira",
+      "Moreninha II": "Bandeira",
+      "Moreninha III": "Bandeira",
+      "Moreninha IV": "Bandeira",
+
+      "Amambaí": "Centro",
+      "Vila Corumbá": "Centro",
+      "26 de Agosto": "Centro",
+      "Centro": "Centro",
+      "Vila Carvalho": "Centro",
+      "Cruzeiro": "Centro",
+      "Jardim dos Estados": "Centro",
+      "Bela Vista": "Centro",
+      "São Bento": "Centro",
+      "Itanhangá": "Centro",
+      
+      "Imbirussu": "Imbirussu",
+      "Popular": "Imbirussu",
+      "Santo Amaro": "Imbirussu",
+      "Sobrinho": "Imbirussu",
+      "Panamá": "Imbirussu",
+      "José Abrão": "Imbirussu",
+      "Nova Campo Grande": "Imbirussu",
+      "Núcleo Industrial": "Imbirussu",
+      "Indubrasil": "Imbirussu",
+
+      "Caiobá": "Lagoa",
+      "Coophavila II": "Lagoa",
+      "Taveirópolis": "Lagoa",
+      "Tijuca": "Lagoa",
+      "Tarumã": "Lagoa",
+      "São Conrado": "Lagoa",
+      "Leblon": "Lagoa",
+      "União": "Lagoa",
+      "Coophamat": "Lagoa",
+
+      "Mata do Segredo": "Prosa",
+      "Nova Lima": "Prosa",
+      "Nasser": "Prosa",
+      "Monte Castelo": "Prosa",
+      "Coronel Antonino": "Prosa",
+      "Seminário": "Prosa",
+
+      "Estrela Dalva": "Segredo",
+      "Vila Nasser": "Segredo",
+      "Jardim Presidente": "Segredo",
+      "Jardim Carioca": "Segredo",
+      "Vida Nova": "Segredo",
+      "Jardim Anache": "Segredo",
+      "Jardim Batistão": "Segredo",
+      "Chácara das Poderes": "Segredo",
+      "Chácara Cachoeira": "Segredo",
+      "Noroeste": "Segredo",
+      "Veraneio": "Segredo",
+      "Carandá": "Segredo",
+      "Carandá Bosque": "Segredo"
+    };
+
+    async function buscarRegiao() {
+      const endereco = document.getElementById("endereco").value;
+      const resultado = document.getElementById("resultado");
+
+      resultado.textContent = "Buscando...";
+
+      const url = `https://api.allorigins.win/get?url=${encodeURIComponent('https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&q=' + endereco + ', Campo Grande, MS, Brasil')}`;
+
+      try {
+        const resposta = await fetch(url);
+        const dados = await resposta.json();
+
+        if (!dados.contents) {
+          resultado.textContent = "Erro na requisição ou endereço não encontrado.";
+          return;
+        }
+
+        const respostaAPI = JSON.parse(dados.contents);
+
+        if (respostaAPI && respostaAPI.length > 0) {
+          const info = respostaAPI[0].address;
+          const bairro = info.suburb || info.neighbourhood || info.village || info.town || "Desconhecido";
+
+          const bairroFormatado = bairro.replace(/jardim|bairro|vila|conjunto|loteamento/gi, '').trim();
+
+          const regiao = mapaRegioes[bairro] || mapaRegioes[bairroFormatado] || "Região não mapeada";
+
+          resultado.innerHTML = `
+            <strong>Endereço:</strong> ${info.road || ''}, ${info.house_number || ''}<br>
+            <strong>Bairro:</strong> ${bairro}<br>
+            <strong>Região:</strong> ${regiao}
+          `;
+        } else {
+          resultado.textContent = "Endereço não encontrado ou não mapeado.";
+        }
+      } catch (e) {
+        console.error(e);
+        resultado.textContent = "Erro ao buscar endereço.";
+      }
+    }
+  </script>
+
+</body>
+</html>
